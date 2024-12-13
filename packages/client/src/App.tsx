@@ -1,29 +1,32 @@
+
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useComponentValue } from "@latticexyz/react";
-import { useMUD } from "./MUDContext";
+import { useMUD } from "./mud/customWalletClient";
 import { singletonEntity } from "@latticexyz/store-sync/recs";
+import { increment } from "./mud/createSystemCalls";
 
 export const App = () => {
-  const {
-    components: { Counter },
-    systemCalls: { increment },
-  } = useMUD();
+  const { network, walletClient } = useMUD();
 
-  const counter = useComponentValue(Counter, singletonEntity);
+  // const counter = useComponentValue(Counter, singletonEntity);
+  const counter = network.useStore((state) => state.getValue(network.tables.Counter, {}));
 
   return (
     <>
-      <div>
-        Counter: <span>{counter?.value ?? "??"}</span>
+    <div className="connect-button-container">
+        <ConnectButton />
       </div>
-      <button
-        type="button"
-        onClick={async (event) => {
-          event.preventDefault();
-          console.log("new counter value:", await increment());
-        }}
-      >
-        Increment
-      </button>
+      <div>
+        Counter:
+        <span>{counter?.value ?? "??"}</span>
+      </div>
+      <div>
+        {walletClient && (
+          <button type="button" onClick={() => increment(walletClient, network)}>
+            Increment
+          </button>
+        )}
+      </div>
     </>
   );
 };

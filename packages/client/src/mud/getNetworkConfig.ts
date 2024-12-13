@@ -1,3 +1,4 @@
+import { type Hex } from "viem";
 /*
  * Network specific configuration for the client.
  * By default connect to the anvil test network.

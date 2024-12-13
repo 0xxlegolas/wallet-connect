@@ -2,12 +2,14 @@
  * Create the system calls that the client can use to ask
  * for changes in the World state (using the System contracts).
  */
+import { type WalletClient } from "viem";
 
 import { getComponentValue } from "@latticexyz/recs";
 import { ClientComponents } from "./createClientComponents";
 import { SetupNetworkResult } from "./setupNetwork";
 import { singletonEntity } from "@latticexyz/store-sync/recs";
-
+import { type MUDNetwork } from "./NetworkContext";
+import IWorldAbi from "contracts/out/IWorld.sol/IWorld.abi.json";
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
 
 export function createSystemCalls(
@@ -49,3 +51,15 @@ export function createSystemCalls(
     increment,
   };
 }
+
+export const increment = async (client: WalletClient, network: MUDNetwork) => {
+  const { request } = await network.publicClient.simulateContract({
+    address: network.worldAddress,
+    abi: IWorldAbi,
+    functionName: "app__increment",
+    args: [],
+    account: client.account,
+  });
+  const tx = await client.writeContract(request);
+  network.waitForTransaction(tx);
+};

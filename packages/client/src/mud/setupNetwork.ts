@@ -14,6 +14,7 @@ import {
   getContract,
 } from "viem";
 import { encodeEntity, syncToRecs } from "@latticexyz/store-sync/recs";
+import { syncToZustand } from "@latticexyz/store-sync/zustand";
 
 import { getNetworkConfig } from "./getNetworkConfig";
 import { world } from "./world";
@@ -77,6 +78,13 @@ export async function setupNetwork() {
     client: { public: publicClient, wallet: burnerWalletClient },
   });
 
+  const { tables, useStore } = await syncToZustand({
+    config: mudConfig,
+    address: networkConfig.worldAddress as Hex,
+    publicClient,
+    startBlock: BigInt(networkConfig.initialBlockNumber),
+  });
+
   /*
    * Sync on-chain state into RECS and keeps our client in sync.
    * Uses the MUD indexer if available, otherwise falls back
@@ -91,16 +99,25 @@ export async function setupNetwork() {
     startBlock: BigInt(networkConfig.initialBlockNumber),
   });
 
+  let nextWriteId = 0;
+  const onWrite = (write: ContractWrite) =>
+    write$.next({ id: `${write.id}:${nextWriteId++}`, request: write.request, result: write.result });
+
+
   return {
     world,
+    worldAddress: networkConfig.worldAddress as Hex,
     components,
     playerEntity: encodeEntity({ address: "address" }, { address: burnerWalletClient.account.address }),
     publicClient,
     walletClient: burnerWalletClient,
     latestBlock$,
     storedBlockLogs$,
+    useStore,
+    tables,
     waitForTransaction,
     worldContract,
+    onWrite,
     write$: write$.asObservable().pipe(share()),
   };
 }
