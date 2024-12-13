@@ -1,0 +1,49 @@
+/* App.css */
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+    padding: 20px;
+}
+
+.connect-button-container {
+    margin-bottom: 20px;
+}
+
+.counter-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.counter-container h2 {
+    margin-right: 10px;
+}
+
+.counter-value {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.increment-button-container {
+    margin-top: 20px;
+}
+
+.increment-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #FF8C00;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.increment-button:hover {
+    background-color: #e07b00;
+}
